@@ -1,0 +1,53 @@
+{
+    "version": "0.1.0",
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+		"markdown.copyFiles.destination": {
+			"": ""
+		},
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/.mypy_cache": true,
+			"**/.pytest_cache": true,
+			"**/my_project.egg-info": true,
+			"**/.ruff_cache": true,
+			"mypy_cache": true,
+			"pytest_cache": true,
+			"ruff_cache": true,
+			".tox": true,
+			"archive": true,
+			"**/egg-info": true,
+		},
+		"mypy.runUsingActiveInterpreter": true,
+		"python.defaultInterpreterPath": "./.venv/Scripts/python",
+		"python.terminal.activateEnvironment": true,
+		"editor.defaultFormatter": "charliermarsh.ruff",
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "always",
+			"source.fixAll.ruff": "always",
+			"source.fixAll": "always"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "vscodevim.vim",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.azure-account",
+        "esbenp.prettier-vscode",
+        "donjayamanne.githistory",
+        "ms-vscode-remote.remote-wsl",
+        "codezombiech.gitignore",
+        "mhutchie.git-graph",
+        "wayou.vscode-todo-highlight",
+        "gruntfuggly.todo-tree"
+    ]
+    },
+}

@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: my_project
+Version: 1.0
+Requires-Python: >=3.12
+Provides-Extra: dev
+Requires-Dist: tox; extra == "dev"
+Requires-Dist: my-project[lint]; extra == "dev"
+Requires-Dist: my-project[test]; extra == "dev"
+Requires-Dist: my-project[doc]; extra == "dev"
+Requires-Dist: my-project[build]; extra == "dev"
+Requires-Dist: jupyter; extra == "dev"
+Provides-Extra: lint
+Requires-Dist: mypy; extra == "lint"
+Requires-Dist: ruff; extra == "lint"
+Provides-Extra: test
+Requires-Dist: pytest>=8.3.3; extra == "test"
+Requires-Dist: pytest-cov>=5.0.0; extra == "test"
+Requires-Dist: coverage[toml]==7.3.1; extra == "test"
+Requires-Dist: pytest-html==4.1.1; extra == "test"
+Provides-Extra: doc
+Provides-Extra: build
+Requires-Dist: build>=1.2.2; extra == "build"
