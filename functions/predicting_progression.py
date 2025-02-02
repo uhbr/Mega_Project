@@ -17,22 +17,20 @@ def predict_patient_progression(df, patient, years_ahead):
     # Assumption: The 'week' column might not be there, so we create it from 'test_time' if necessary
     if "week" not in df.columns:
         if "test_time" in df.columns:
-            df["week"] = (df["test_time"] / 7).astype(int)  # Create 'week' from 'test_time' (assuming it's in days)
+            df["week"] = df["test_time"].apply(lambda x: 0 if x < 0 else (x // 7) + 1)
         else:
             msg = "'week' column or 'test_time' column not found in the dataset."  # Assumed error handling
             raise ValueError(msg)
 
-    # Initialize df_grouped which will be used for regression
-    df_grouped = pd.DataFrame()
-
     if patient == "mean":
         # Calculate the mean parameters per week for the entire dataset
-        df_grouped = df.groupby("week")[["motor_UPDRS", "total_UPDRS"]].mean()
+        df_grouped = df.groupby(["subject#","week"])[["motor_UPDRS", "total_UPDRS"]].mean()
+        df_mean = df_grouped.groupby("week")[["motor_UPDRS", "total_UPDRS"]].mean()
 
         # Assumption: We filter out weeks with fewer than 21 patients for valid analysis
         subject_counts_per_week = df.groupby("week")["subject#"].nunique()
         valid_weeks = subject_counts_per_week[subject_counts_per_week >= 21].index
-        df_grouped = df_grouped[df_grouped.index.isin(valid_weeks)]
+        df_mean = df_mean[df_mean.index.isin(valid_weeks)]
 
     elif isinstance(patient, int) and 1 <= patient <= 42:
         # Assumption: If a specific patient is selected, we handle it gracefully
@@ -43,26 +41,26 @@ def predict_patient_progression(df, patient, years_ahead):
             return
 
         # Calculate the mean for the specific patient per week
-        df_grouped = subject_data.groupby("week")[["motor_UPDRS", "total_UPDRS"]].mean()
+        df_mean = subject_data.groupby("week")[["motor_UPDRS", "total_UPDRS"]].mean()
 
     else:
         print("Invalid patient. Please enter 'mean' or a valid patient ID (1-42).")  # Assumption: patient input must be valid
         return
 
     # Prepare data for linear regression (assuming linearity in progression)
-    X = df_grouped.index.values.reshape(-1, 1)  # weeks as input feature
-    y_motor = df_grouped["motor_UPDRS"].values
-    y_total = df_grouped["total_UPDRS"].values
+    x = df_mean.index.values.reshape(-1, 1)  # weeks as input feature
+    y_motor = df_mean["motor_UPDRS"].values
+    y_total = df_mean["total_UPDRS"].values
 
     # Train models for motor and total UPDRS
     motor_model = LinearRegression()
     total_model = LinearRegression()
 
-    motor_model.fit(X, y_motor)
-    total_model.fit(X, y_total)
+    motor_model.fit(x, y_motor)
+    total_model.fit(x, y_total)
 
     # Predict progression over the next 10 years (weeks) - assuming linear trend for the future
-    time_range = np.linspace(df_grouped.index.min(), df_grouped.index.max() + (years_ahead * 52), 100).reshape(-1, 1)
+    time_range = np.linspace(df_mean.index.min(), df_mean.index.max() + (years_ahead * 52), 100).reshape(-1, 1)
     predicted_motor = motor_model.predict(time_range)
     predicted_total = total_model.predict(time_range)
 
@@ -71,8 +69,8 @@ def predict_patient_progression(df, patient, years_ahead):
 
     # Add original data points (actual observed data by week)
     fig.add_trace(go.Scatter(
-        x=df_grouped.index,
-        y=df_grouped["motor_UPDRS"],
+        x=df_mean.index,
+        y=df_mean["motor_UPDRS"],
         mode="markers",
         name="Observed motor_UPDRS",
         marker={"color": "blue"},
@@ -81,8 +79,8 @@ def predict_patient_progression(df, patient, years_ahead):
     ))
 
     fig.add_trace(go.Scatter(
-        x=df_grouped.index,
-        y=df_grouped["total_UPDRS"],
+        x=df_mean.index,
+        y=df_mean["total_UPDRS"],
         mode="markers",
         name="Observed total_UPDRS",
         marker={"color": "red"},
@@ -121,11 +119,10 @@ def predict_patient_progression(df, patient, years_ahead):
     fig.show()
 
 
-
-
 if __name__ == "__main__":
     # Load dataset
     df = pd.read_csv("datasets/parkinsons_updrs.data.csv")
 
     # 1. Predict progression for the mean patient over the next 10 years
     predict_patient_progression(df, patient="mean", years_ahead=10)
+    predict_patient_progression(df, patient=35, years_ahead=3)

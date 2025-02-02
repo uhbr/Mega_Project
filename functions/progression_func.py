@@ -18,7 +18,8 @@ def plot_parkinsons_progression(df, min_subjects = 21):
         None: Displays the progression plots for the mean patient.
     """
     # Step 1: Convert 'test_time' to weeks (round down to the nearest integer for week number)
-    df["week"] = np.floor(df["test_time"] / 7).astype(int)
+    if "week" not in df.columns:
+        df["week"] = df["test_time"].apply(lambda x: 0 if x < 0 else (x // 7) + 1)
 
     # Step 2: Count the unique subjects for each week
     subjects_per_week = df.groupby("week")["subject#"].nunique()

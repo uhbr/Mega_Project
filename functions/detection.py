@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
@@ -70,6 +71,21 @@ def plot_feature_importance(model: RandomForestClassifier, x: pd.DataFrame):
     plt.show()
 
 
+def plot_predicted_vs_actual(y_test, y_pred):
+    """Plots a comparison between predicted and actual values."""
+
+    # Bar plot for actual vs predicted
+    comparison_df = pd.DataFrame({"Actual": y_test, "Predicted": y_pred})
+    comparison_df = comparison_df.reset_index(drop=True)
+
+    # Plotting the actual vs predicted values
+    comparison_df.plot(kind="bar", color=["skyblue", "salmon"], width=0.8)
+    plt.title("Predicted vs Actual Values")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Status (0: Healthy, 1: Parkinson's Disease)")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
 
 def operating(df: pd.DataFrame):
@@ -88,6 +104,9 @@ def operating(df: pd.DataFrame):
 
     # Plot feature importance (with percentage scaling)
     plot_feature_importance(model, x_train)  # Pass x_train directly
+
+    # Plot True vs Predicted
+    plot_predicted_vs_actual(y_test, y_pred)  # Pass true vs predicted values
 
 
 if __name__ == "__main__":
